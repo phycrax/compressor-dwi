@@ -1,0 +1,19 @@
+[package]
+name = "secop-ccd-swi"
+version = "0.1.0"
+edition = "2024"
+description = "Single Wire Interface (SWI) Driver for Secop CCD compressor inverters (NLV/SLVE)"
+repository = "https://github.com/phycrax/secop-ccd"
+license = "MIT OR Apache-2.0"
+categories = ["embedded", "no-std", "asynchronous"]
+keywords = ["compressor", "inverter"]
+
+[features]
+defmt = ["dep:defmt"]
+
+[dependencies]
+embedded-hal-async = "1.0"
+embedded-io-async = "0.7"
+defmt = { version = "1.1.1", optional = true }
+embassy-futures = "0.1.2"
+crc = "3.4"
