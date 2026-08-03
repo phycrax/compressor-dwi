@@ -1,31 +1,24 @@
 /// Inverter operation status and its fault flags.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub struct OperationStatus(u16);
+pub struct OperationStatus {
+    /// Whether the compressor is running
+    pub running: bool,
+    /// Faults, or `None` if no fault bit is set
+    pub faults: Option<Faults>,
+}
 
 impl OperationStatus {
-    pub(crate) const fn new(raw: u16) -> Self {
-        Self(raw)
-    }
-
-    /// Whether the compressor is running
-    pub const fn running(&self) -> bool {
-        self.0 & 0xFF00 == 0
-    }
-
-    /// Faults, or `None` if no fault bit is set
-    pub const fn faults(&self) -> Option<Faults> {
-        let bits = (self.0 & 0x00FF) as u8;
-        if bits == 0 {
-            None
-        } else {
-            Some(Faults::from_bits(bits))
+    pub(crate) const fn from_bits(raw: u16) -> Self {
+        Self {
+            running: raw & 0xFF00 == 0,
+            faults: Faults::from_bits((raw & 0x00FF) as u8),
         }
     }
 }
 
 /// Fault flags derived from [`OperationStatus`].
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Faults {
     /// `0x01`
@@ -45,8 +38,13 @@ pub struct Faults {
 }
 
 impl Faults {
-    const fn from_bits(bits: u8) -> Self {
-        Self {
+    /// `None` when no fault bit is set.
+    const fn from_bits(bits: u8) -> Option<Self> {
+        if bits == 0 {
+            return None;
+        }
+
+        Some(Self {
             start_fail: bits & 0x01 != 0,
             under_speed: bits & 0x04 != 0,
             wrong_rotor_position: bits & 0x08 != 0,
@@ -54,6 +52,6 @@ impl Faults {
             over_temperature: bits & 0x20 != 0,
             serial_fail: bits & 0x40 != 0,
             speed_out_of_range: bits & 0x80 != 0,
-        }
+        })
     }
 }

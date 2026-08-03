@@ -54,7 +54,7 @@ impl<TX: Write, RX: Read, D: DelayNs> Driver<TX, RX, D> {
     /// | Above 6000 | stop |
     pub async fn set_speed(&mut self, val: u16) -> Result<OperationStatus, Error> {
         let bytes = self.req_resp(&Command::set_speed(val)).await?;
-        Ok(OperationStatus::new(u16::from_le_bytes(bytes)))
+        Ok(OperationStatus::from_bits(u16::from_le_bytes(bytes)))
     }
 
     /// Read the currently set speed (RPM).
@@ -66,7 +66,7 @@ impl<TX: Write, RX: Read, D: DelayNs> Driver<TX, RX, D> {
     /// Read the operation-status word.
     pub async fn read_operation_status(&mut self) -> Result<OperationStatus, Error> {
         let bytes = self.req_resp(&Command::read_operation_status()).await?;
-        Ok(OperationStatus::new(u16::from_le_bytes(bytes)))
+        Ok(OperationStatus::from_bits(u16::from_le_bytes(bytes)))
     }
 
     /// Read the measured compressor speed (RPM).
