@@ -2,17 +2,19 @@
 name = "compressor-dwi"
 version = "0.1.0"
 edition = "2024"
-description = "Dual-wire serial protocol driver for compressor inverters"
+description = "Dual-wire async serial protocol driver for compressor inverters"
 repository = "https://github.com/phycrax/compressor-dwi"
 license = "MIT OR Apache-2.0"
 categories = ["embedded", "no-std", "asynchronous"]
-keywords = ["compressor", "inverter", "secop", "embraco"]
+keywords = ["compressor", "inverter", "hvac"]
 
 [features]
 defmt = ["dep:defmt"]
 
 [dependencies]
-embedded-hal-async = "1.0"
-embedded-io-async = "0.7"
-defmt = { version = "1.1.1", optional = true }
+embedded-hal-async  = { workspace = true }
+embedded-io-async   = { workspace = true }
+defmt               = { workspace = true, optional = true }
+
 embassy-futures = "0.1.2"
+ 
