@@ -3,6 +3,7 @@ resolver = "2"
 
 members = [
     "compressor-dwi",
+    "secop-dwi",
 ]
 
 [workspace.dependencies]

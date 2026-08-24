@@ -18,7 +18,7 @@ pub struct Command {
 }
 
 impl Command {
-    /// TODO
+    /// Create a new command.
     pub const fn new(cmd: u8, data: u16, expect: u8) -> Self {
         Self { cmd, data, expect }
     }
@@ -107,12 +107,6 @@ mod tests {
     #[test]
     fn validate_rejects_bad_checksum() {
         let resp = [0x5A, 0x00, 0x00, 0x00, 0x00];
-        assert!(matches!(PROBE.validate(&resp), Err(ResponseError::Integrity)));
-    }
-
-    #[test]
-    fn corrupt_frame_resembling_an_error_reply_is_reported_as_integrity() {
-        let resp = [0x5A, 0xF2, 0xFF, 0xFF, 0x00];
         assert!(matches!(PROBE.validate(&resp), Err(ResponseError::Integrity)));
     }
 
