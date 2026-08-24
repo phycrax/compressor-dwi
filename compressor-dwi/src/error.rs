@@ -1,5 +1,7 @@
-/// Error type for DWI operations
-#[derive(Debug)]
+//! Error types
+
+/// Error type for dual-wire operations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Error {
     /// Read error from the underlying serial interface.
@@ -12,8 +14,14 @@ pub enum Error {
     Response(ResponseError),
 }
 
-/// Error type for responses from the inverter
-#[derive(Debug)]
+impl From<ResponseError> for Error {
+    fn from(e: ResponseError) -> Self {
+        Self::Response(e)
+    }
+}
+
+/// Error type for responses from the inverter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ResponseError {
     /// Bad checksum in a received frame.
@@ -26,22 +34,23 @@ pub enum ResponseError {
     Communication(CommunicationError),
 }
 
-/// Communication-error reported by the inverter
-#[derive(Debug)]
+/// Communication-error reported by the inverter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum CommunicationError {
-    /// `0xF0` error in byte 4 (data high; valid for commands 2 and 3).
+    /// `0xF0` error in byte 4 (data high).
     DataHigh,
     /// `0xF2` checksum error (byte 5).
     Checksum,
     /// `0xF4` bad command code (byte 2).
     Command,
-    /// `0xF8` error in byte 3 (data low; valid for commands 2 and 3).
+    /// `0xF8` error in byte 3 (data low).
     DataLow,
 }
 
 impl CommunicationError {
-    pub(crate) fn from_code(code: u8) -> Option<Self> {
+    /// Map an error-frame code byte, or `None` if it is not a known code.
+    pub(crate) const fn from_code(code: u8) -> Option<Self> {
         match code {
             0xF0 => Some(Self::DataHigh),
             0xF2 => Some(Self::Checksum),
