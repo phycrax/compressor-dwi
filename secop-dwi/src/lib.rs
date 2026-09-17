@@ -1,4 +1,4 @@
-//! Dual Wire Interface (DWI) driver for Secop CCD inverters (NLV/SLVE).
+//! Dual Wire Interface (DWI) driver for Secop CCD compressors (NLV/SLVE).
 #![no_std]
 #![warn(missing_docs)]
 
@@ -7,7 +7,7 @@ pub use compressor_dwi::{Config, Error};
 use embedded_hal_async::delay::DelayNs;
 use embedded_io_async::{Read, Write};
 
-/// Operation status of the inverter.
+/// Operation status of the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Status {
@@ -26,7 +26,7 @@ impl Status {
     }
 }
 
-/// Fault flags reported by the inverter.
+/// Fault flags reported by the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Faults {
@@ -64,12 +64,12 @@ impl Faults {
     }
 }
 
-/// Secop CCD inverter driver.
-pub struct Inverter<TX, RX, D> {
+/// Secop CCD compressor driver.
+pub struct Compressor<TX, RX, D> {
     inner: Driver<TX, RX, D>,
 }
 
-impl<TX: Write, RX: Read, D: DelayNs> Inverter<TX, RX, D> {
+impl<TX: Write, RX: Read, D: DelayNs> Compressor<TX, RX, D> {
     /// Create a driver.
     pub const fn new(tx: TX, rx: RX, delay: D, cfg: Config) -> Self {
         Self {
@@ -111,7 +111,7 @@ impl<TX: Write, RX: Read, D: DelayNs> Inverter<TX, RX, D> {
         self.inner.transact(&Command::new(0x3C, 0x3982, 0x82)).await
     }
 
-    /// Read the inverter temperature in 0.1 °C.
+    /// Read the compressor temperature in 0.1 °C.
     pub async fn read_temperature(&mut self) -> Result<i16, Error> {
         Ok(self.inner.transact(&Command::new(0x3C, 0x3988, 0x88)).await? as i16)
     }

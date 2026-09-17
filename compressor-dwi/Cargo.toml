@@ -2,11 +2,11 @@
 name = "compressor-dwi"
 version = "0.1.0"
 edition = "2024"
-description = "Dual-wire async serial protocol driver for compressor inverters"
+description = "Dual-wire async serial protocol driver for compressor drivers"
 repository = "https://github.com/phycrax/compressor-dwi"
 license = "MIT OR Apache-2.0"
 categories = ["embedded", "no-std", "asynchronous"]
-keywords = ["compressor", "inverter", "hvac"]
+keywords = ["compressor", "driver", "hvac"]
 
 [features]
 defmt = ["dep:defmt"]

@@ -1,4 +1,4 @@
-//! Core of the dual-wire serial protocol shared by compressor inverters.
+//! Core of the dual-wire serial protocol shared by compressor drivers.
 #![no_std]
 #![warn(missing_docs)]
 

@@ -20,7 +20,7 @@ impl From<ResponseError> for Error {
     }
 }
 
-/// Error type for responses from the inverter.
+/// Error type for responses from the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum ResponseError {
@@ -30,11 +30,11 @@ pub enum ResponseError {
     RxId,
     /// Bad command code in a received frame.
     InvalidResponse,
-    /// The inverter rejected the request with a communication-error.
+    /// The compressor rejected the request with a communication-error.
     Communication(CommunicationError),
 }
 
-/// Communication-error reported by the inverter.
+/// Communication-error reported by the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum CommunicationError {

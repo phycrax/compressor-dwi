@@ -1,4 +1,4 @@
-//! Dual Wire Interface (DWI) driver for Embraco CF10B inverters.
+//! Dual Wire Interface (DWI) driver for Embraco CF10B compressors.
 #![no_std]
 #![warn(missing_docs)]
 
@@ -7,7 +7,7 @@ pub use compressor_dwi::{Config, Error};
 use embedded_hal_async::delay::DelayNs;
 use embedded_io_async::{Read, Write};
 
-/// Operation status of the inverter.
+/// Operation status of the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct Status {
@@ -26,7 +26,7 @@ impl Status {
     }
 }
 
-/// Fault flags reported by the inverter.
+/// Fault flags reported by the compressor.
 ///
 /// Whether a fault stopped the compressor is carried by [`Status::running`],
 /// not by these flags: `overload` while running is the protection engaging.
@@ -67,12 +67,12 @@ impl Faults {
     }
 }
 
-/// Embraco CF10B inverter driver.
-pub struct Inverter<TX, RX, D> {
+/// Embraco CF10B compressor driver.
+pub struct Compressor<TX, RX, D> {
     inner: Driver<TX, RX, D>,
 }
 
-impl<TX: Write, RX: Read, D: DelayNs> Inverter<TX, RX, D> {
+impl<TX: Write, RX: Read, D: DelayNs> Compressor<TX, RX, D> {
     /// Create a driver.
     pub const fn new(tx: TX, rx: RX, delay: D, cfg: Config) -> Self {
         Self {
@@ -109,7 +109,7 @@ impl<TX: Write, RX: Read, D: DelayNs> Inverter<TX, RX, D> {
         self.inner.transact(&Command::new(0x3C, 0x3982, 0x82)).await
     }
 
-    /// Read the inverter temperature in 0.1 °C.
+    /// Read the compressor temperature in 0.1 °C.
     pub async fn read_temperature(&mut self) -> Result<i16, Error> {
         Ok(self.inner.transact(&Command::new(0x3C, 0x3988, 0x88)).await? as i16)
     }
@@ -131,7 +131,7 @@ impl<TX: Write, RX: Read, D: DelayNs> Inverter<TX, RX, D> {
 
     /// Choose whether a serial set speed overrides the thermostat set point.
     ///
-    /// Returns the state the inverter reports, which need not match what was requested.
+    /// Returns the state the compressor reports, which need not match what was requested.
     /// Reverts to `false` after 4 hours without serial communication.
     pub async fn set_speed_overwrite(&mut self, enable: bool) -> Result<bool, Error> {
         let data = 0x9300 | enable as u16;

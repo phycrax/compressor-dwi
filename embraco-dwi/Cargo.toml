@@ -2,11 +2,11 @@
 name = "embraco-dwi"
 version = "0.1.0"
 edition = "2024"
-description = "Dual-wire async serial protocol driver for Embraco CF10B compressor inverters"
+description = "Dual-wire async serial protocol driver for Embraco CF10B compressor drivers"
 repository = "https://github.com/phycrax/compressor-dwi"
 license = "MIT OR Apache-2.0"
 categories = ["embedded", "no-std", "asynchronous"]
-keywords = ["compressor", "inverter", "hvac", "embraco"]
+keywords = ["compressor", "driver", "hvac", "embraco"]
 
 [features]
 defmt = ["dep:defmt", "compressor-dwi/defmt"]
