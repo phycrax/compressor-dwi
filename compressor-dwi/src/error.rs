@@ -8,8 +8,6 @@ pub enum Error {
     Read,
     /// Write error from the underlying serial interface.
     Write,
-    /// No response within the configured timeout.
-    Timeout,
     /// Bad response from the device.
     Response(ResponseError),
 }

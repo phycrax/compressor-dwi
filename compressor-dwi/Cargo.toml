@@ -12,9 +12,5 @@ keywords = ["compressor", "driver", "hvac"]
 defmt = ["dep:defmt"]
 
 [dependencies]
-embedded-hal-async  = { workspace = true }
 embedded-io-async   = { workspace = true }
 defmt               = { workspace = true, optional = true }
-
-embassy-futures = "0.1.2"
- 

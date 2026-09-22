@@ -7,5 +7,5 @@ mod driver;
 mod error;
 
 pub use command::Command;
-pub use driver::{Config, Driver};
+pub use driver::Driver;
 pub use error::*;

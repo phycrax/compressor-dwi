@@ -2,10 +2,9 @@
 #![no_std]
 #![warn(missing_docs)]
 
+pub use compressor_dwi::Error;
 use compressor_dwi::{Command, Driver};
-pub use compressor_dwi::{Config, Error};
-use embedded_hal_async::delay::DelayNs;
-use embedded_io_async::{Read, Write};
+use embedded_io_async::{Read, ReadReady, Write};
 
 /// Operation status of the compressor.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -68,20 +67,20 @@ impl Faults {
 }
 
 /// Embraco CF10B compressor driver.
-pub struct Compressor<TX, RX, D> {
-    inner: Driver<TX, RX, D>,
+pub struct Compressor<TX, RX> {
+    inner: Driver<TX, RX>,
 }
 
-impl<TX: Write, RX: Read, D: DelayNs> Compressor<TX, RX, D> {
+impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
     /// Create a driver.
-    pub const fn new(tx: TX, rx: RX, delay: D, cfg: Config) -> Self {
+    pub const fn new(tx: TX, rx: RX) -> Self {
         Self {
-            inner: Driver::new(tx, rx, delay, cfg),
+            inner: Driver::new(tx, rx),
         }
     }
 
-    /// Release the serial halves and the delay provider.
-    pub fn release(self) -> (TX, RX, D) {
+    /// Give back the serial halves.
+    pub fn release(self) -> (TX, RX) {
         self.inner.release()
     }
 

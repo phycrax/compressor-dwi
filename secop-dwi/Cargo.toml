@@ -13,6 +13,5 @@ defmt = ["dep:defmt", "compressor-dwi/defmt"]
 
 [dependencies]
 compressor-dwi      = { path = "../compressor-dwi" }
-embedded-hal-async  = { workspace = true }
 embedded-io-async   = { workspace = true }
 defmt               = { workspace = true, optional = true }
