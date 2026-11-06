@@ -17,7 +17,8 @@ pub struct Status {
 }
 
 impl Status {
-    const fn from_bits(raw: u16) -> Self {
+    /// [`Request::SetSpeed`] and [`Request::ReadStatus`] answers with this.
+    pub const fn from_bits(raw: u16) -> Self {
         Self {
             running: raw & 0xFF00 == 0,
             faults: Faults::from_bits((raw & 0x00FF) as u8),
@@ -63,6 +64,40 @@ impl Faults {
     }
 }
 
+/// Request to the compressor with an u16 response.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub enum Request {
+    /// Set the speed (RPM), answers with the status, see [`Status::from_bits`].
+    SetSpeed(u16),
+    /// Read the currently set speed (RPM).
+    ReadSetSpeed,
+    /// Read the operation status, see [`Status::from_bits`].
+    ReadStatus,
+    /// Read the measured compressor speed (RPM).
+    ReadActualSpeed,
+    /// Read the power consumption (W).
+    ReadPower,
+    /// Read the compressor temperature in 0.1 °C, as an `i16`.
+    ReadTemperature,
+    /// Read the input voltage (V).
+    ReadInputVoltage,
+}
+
+impl Request {
+    const fn command(self) -> Command {
+        match self {
+            Self::SetSpeed(rpm) => Command::new(0xC3, rpm, 0x83),
+            Self::ReadSetSpeed => Command::new(0x3C, 0x3980, 0x80),
+            Self::ReadStatus => Command::new(0x3C, 0x3983, 0x83),
+            Self::ReadActualSpeed => Command::new(0x3C, 0x3986, 0x86),
+            Self::ReadPower => Command::new(0x3C, 0x3982, 0x82),
+            Self::ReadTemperature => Command::new(0x3C, 0x3988, 0x88),
+            Self::ReadInputVoltage => Command::new(0x3B, 0x0101, 0x01),
+        }
+    }
+}
+
 /// Secop CCD compressor driver.
 pub struct Compressor<TX, RX> {
     inner: Driver<TX, RX>,
@@ -81,43 +116,44 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
         self.inner.release()
     }
 
+    /// Sends `request` and returns the u16 it answers with.
+    pub async fn request(&mut self, request: Request) -> Result<u16, Error> {
+        self.inner.transact(&request.command()).await
+    }
+
     /// Set the speed (RPM), and read back the resulting status.
     pub async fn set_speed(&mut self, rpm: u16) -> Result<Status, Error> {
-        Ok(Status::from_bits(
-            self.inner.transact(&Command::new(0xC3, rpm, 0x83)).await?,
-        ))
+        Ok(Status::from_bits(self.request(Request::SetSpeed(rpm)).await?))
     }
 
     /// Read the currently set speed (RPM).
     pub async fn read_set_speed(&mut self) -> Result<u16, Error> {
-        self.inner.transact(&Command::new(0x3C, 0x3980, 0x80)).await
+        self.request(Request::ReadSetSpeed).await
     }
 
     /// Read the operation-status word.
     pub async fn read_status(&mut self) -> Result<Status, Error> {
-        Ok(Status::from_bits(
-            self.inner.transact(&Command::new(0x3C, 0x3983, 0x83)).await?,
-        ))
+        Ok(Status::from_bits(self.request(Request::ReadStatus).await?))
     }
 
     /// Read the measured compressor speed (RPM).
     pub async fn read_actual_speed(&mut self) -> Result<u16, Error> {
-        self.inner.transact(&Command::new(0x3C, 0x3986, 0x86)).await
+        self.request(Request::ReadActualSpeed).await
     }
 
     /// Read the power consumption (W).
     pub async fn read_power(&mut self) -> Result<u16, Error> {
-        self.inner.transact(&Command::new(0x3C, 0x3982, 0x82)).await
+        self.request(Request::ReadPower).await
     }
 
     /// Read the compressor temperature in 0.1 °C.
     pub async fn read_temperature(&mut self) -> Result<i16, Error> {
-        Ok(self.inner.transact(&Command::new(0x3C, 0x3988, 0x88)).await? as i16)
+        Ok(self.request(Request::ReadTemperature).await? as i16)
     }
 
     /// Read the input voltage (V).
     pub async fn read_input_voltage(&mut self) -> Result<u16, Error> {
-        self.inner.transact(&Command::new(0x3B, 0x0101, 0x01)).await
+        self.request(Request::ReadInputVoltage).await
     }
 }
 
@@ -145,6 +181,22 @@ mod tests {
         ];
         for (cmd, expected) in cases {
             assert_eq!(cmd.encode(), expected, "frame mismatch for {cmd:?}");
+        }
+    }
+
+    #[test]
+    fn requests_send_their_frames() {
+        let cases: [(Request, [u8; 5]); 7] = [
+            (Request::SetSpeed(3000), [0xA5, 0xC3, 0xB8, 0x0B, 0xD5]),
+            (Request::ReadSetSpeed, [0xA5, 0x3C, 0x80, 0x39, 0x66]),
+            (Request::ReadPower, [0xA5, 0x3C, 0x82, 0x39, 0x64]),
+            (Request::ReadStatus, [0xA5, 0x3C, 0x83, 0x39, 0x63]),
+            (Request::ReadActualSpeed, [0xA5, 0x3C, 0x86, 0x39, 0x60]),
+            (Request::ReadTemperature, [0xA5, 0x3C, 0x88, 0x39, 0x5E]),
+            (Request::ReadInputVoltage, [0xA5, 0x3B, 0x01, 0x01, 0x1E]),
+        ];
+        for (request, expected) in cases {
+            assert_eq!(request.command().encode(), expected, "frame mismatch for {request:?}");
         }
     }
 
