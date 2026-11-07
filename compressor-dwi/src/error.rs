@@ -1,20 +1,35 @@
 //! Error types
 
+use embedded_io_async::ReadExactError;
+
 /// Error type for dual-wire operations.
+///
+/// `TX` and `RX` are the error types of the serial halves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub enum Error {
+pub enum Error<TX, RX> {
     /// Read error from the underlying serial interface.
-    Read,
+    Read(RX),
     /// Write error from the underlying serial interface.
-    Write,
+    Write(TX),
+    /// The serial interface hit end-of-file before a full response arrived.
+    UnexpectedEof,
     /// Bad response from the device.
     Response(ResponseError),
 }
 
-impl From<ResponseError> for Error {
+impl<TX, RX> From<ResponseError> for Error<TX, RX> {
     fn from(e: ResponseError) -> Self {
         Self::Response(e)
+    }
+}
+
+impl<TX, RX> From<ReadExactError<RX>> for Error<TX, RX> {
+    fn from(e: ReadExactError<RX>) -> Self {
+        match e {
+            ReadExactError::UnexpectedEof => Self::UnexpectedEof,
+            ReadExactError::Other(e) => Self::Read(e),
+        }
     }
 }
 

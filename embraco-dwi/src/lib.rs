@@ -126,47 +126,47 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
     }
 
     /// Sends `request` and returns the u16 it answers with.
-    pub async fn request(&mut self, request: Request) -> Result<u16, Error> {
+    pub async fn request(&mut self, request: Request) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.inner.transact(&request.command()).await
     }
 
     /// Set the speed (RPM), and read back the resulting status.
-    pub async fn set_speed(&mut self, rpm: u16) -> Result<Status, Error> {
+    pub async fn set_speed(&mut self, rpm: u16) -> Result<Status, Error<TX::Error, RX::Error>> {
         Ok(Status::from_bits(self.request(Request::SetSpeed(rpm)).await?))
     }
 
     /// Read the currently set speed (RPM).
-    pub async fn read_set_speed(&mut self) -> Result<u16, Error> {
+    pub async fn read_set_speed(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadSetSpeed).await
     }
 
     /// Read the operation-status word.
-    pub async fn read_status(&mut self) -> Result<Status, Error> {
+    pub async fn read_status(&mut self) -> Result<Status, Error<TX::Error, RX::Error>> {
         Ok(Status::from_bits(self.request(Request::ReadStatus).await?))
     }
 
     /// Read the power consumption (W).
-    pub async fn read_power(&mut self) -> Result<u16, Error> {
+    pub async fn read_power(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadPower).await
     }
 
     /// Read the compressor temperature in 0.1 °C.
-    pub async fn read_temperature(&mut self) -> Result<i16, Error> {
+    pub async fn read_temperature(&mut self) -> Result<i16, Error<TX::Error, RX::Error>> {
         Ok(self.request(Request::ReadTemperature).await? as i16)
     }
 
     /// Read the number of starting trials.
-    pub async fn read_starting_trials(&mut self) -> Result<u16, Error> {
+    pub async fn read_starting_trials(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadStartingTrials).await
     }
 
     /// Read the DC bus voltage (V).
-    pub async fn read_bus_voltage(&mut self) -> Result<u16, Error> {
+    pub async fn read_bus_voltage(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadBusVoltage).await
     }
 
     /// Read the active power limitation (W).
-    pub async fn read_power_limitation(&mut self) -> Result<u16, Error> {
+    pub async fn read_power_limitation(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadPowerLimitation).await
     }
 
@@ -174,7 +174,7 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
     ///
     /// Returns the state the compressor reports, which need not match what was requested.
     /// Reverts to `false` after 4 hours without serial communication.
-    pub async fn set_speed_overwrite(&mut self, enable: bool) -> Result<bool, Error> {
+    pub async fn set_speed_overwrite(&mut self, enable: bool) -> Result<bool, Error<TX::Error, RX::Error>> {
         Ok(self.request(Request::SetSpeedOverwrite(enable)).await? & 0x00FF != 0)
     }
 }

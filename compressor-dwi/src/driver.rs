@@ -22,16 +22,16 @@ impl<TX: Write, RX: Read + ReadReady> Driver<TX, RX> {
     }
 
     /// Send a request, await its reply, and return the response.
-    pub async fn transact(&mut self, cmd: &Command) -> Result<u16, Error> {
+    pub async fn transact(&mut self, cmd: &Command) -> Result<u16, Error<TX::Error, RX::Error>> {
         let mut sink = [0u8; 16];
-        while self.rx.read_ready().map_err(|_| Error::Read)? {
-            self.rx.read(&mut sink).await.map_err(|_| Error::Read)?;
+        while self.rx.read_ready().map_err(Error::Read)? {
+            self.rx.read(&mut sink).await.map_err(Error::Read)?;
         }
 
-        self.tx.write_all(&cmd.encode()).await.map_err(|_| Error::Write)?;
+        self.tx.write_all(&cmd.encode()).await.map_err(Error::Write)?;
 
         let mut resp = [0u8; 5];
-        self.rx.read_exact(&mut resp).await.map_err(|_| Error::Read)?;
+        self.rx.read_exact(&mut resp).await?;
 
         cmd.validate(&resp)?;
 

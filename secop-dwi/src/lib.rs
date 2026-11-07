@@ -117,42 +117,42 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
     }
 
     /// Sends `request` and returns the u16 it answers with.
-    pub async fn request(&mut self, request: Request) -> Result<u16, Error> {
+    pub async fn request(&mut self, request: Request) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.inner.transact(&request.command()).await
     }
 
     /// Set the speed (RPM), and read back the resulting status.
-    pub async fn set_speed(&mut self, rpm: u16) -> Result<Status, Error> {
+    pub async fn set_speed(&mut self, rpm: u16) -> Result<Status, Error<TX::Error, RX::Error>> {
         Ok(Status::from_bits(self.request(Request::SetSpeed(rpm)).await?))
     }
 
     /// Read the currently set speed (RPM).
-    pub async fn read_set_speed(&mut self) -> Result<u16, Error> {
+    pub async fn read_set_speed(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadSetSpeed).await
     }
 
     /// Read the operation-status word.
-    pub async fn read_status(&mut self) -> Result<Status, Error> {
+    pub async fn read_status(&mut self) -> Result<Status, Error<TX::Error, RX::Error>> {
         Ok(Status::from_bits(self.request(Request::ReadStatus).await?))
     }
 
     /// Read the measured compressor speed (RPM).
-    pub async fn read_actual_speed(&mut self) -> Result<u16, Error> {
+    pub async fn read_actual_speed(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadActualSpeed).await
     }
 
     /// Read the power consumption (W).
-    pub async fn read_power(&mut self) -> Result<u16, Error> {
+    pub async fn read_power(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadPower).await
     }
 
     /// Read the compressor temperature in 0.1 °C.
-    pub async fn read_temperature(&mut self) -> Result<i16, Error> {
+    pub async fn read_temperature(&mut self) -> Result<i16, Error<TX::Error, RX::Error>> {
         Ok(self.request(Request::ReadTemperature).await? as i16)
     }
 
     /// Read the input voltage (V).
-    pub async fn read_input_voltage(&mut self) -> Result<u16, Error> {
+    pub async fn read_input_voltage(&mut self) -> Result<u16, Error<TX::Error, RX::Error>> {
         self.request(Request::ReadInputVoltage).await
     }
 }
