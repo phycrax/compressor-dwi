@@ -5,6 +5,7 @@ use embedded_io_async::{Read, ReadReady, Write};
 use crate::{Command, Error};
 
 /// Serial driver.
+#[derive(Debug)]
 pub struct Driver<TX, RX> {
     tx: TX,
     rx: RX,

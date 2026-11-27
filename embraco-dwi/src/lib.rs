@@ -108,6 +108,7 @@ impl Request {
 }
 
 /// Embraco CF10B compressor driver.
+#[derive(Debug)]
 pub struct Compressor<TX, RX> {
     inner: Driver<TX, RX>,
 }
