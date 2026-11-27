@@ -1,0 +1,18 @@
+# cargo-release config: https://github.com/crate-ci/cargo-release/blob/HEAD/docs/reference.md
+# Release a crate with `cargo release <level> -p <crate> --execute`.
+# Without `--execute` it is a dry run that changes nothing.
+
+allow-branch = ["main"]
+
+# The pushed tag starts .github/workflows/release.yml, which publishes to crates.io.
+publish = false
+
+# One commit per crate, so the message can name it.
+consolidate-commits = false
+pre-release-commit-message = "release {{crate_name}} {{version}}"
+tag-message = "{{crate_name}} {{version}}"
+
+# Turn "## Unreleased" into "## <version> - <date>" and start a new "## Unreleased" above it.
+pre-release-replacements = [
+  { file = "CHANGELOG.md", search = "## Unreleased", replace = "## Unreleased\n\n## {{version}} - {{date}}", exactly = 1 },
+]
