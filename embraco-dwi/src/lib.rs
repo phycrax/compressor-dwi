@@ -152,7 +152,7 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
 
     /// Read the compressor temperature in 0.1 °C.
     pub async fn read_temperature(&mut self) -> Result<i16, Error<TX::Error, RX::Error>> {
-        Ok(self.request(Request::ReadTemperature).await? as i16)
+        Ok(self.request(Request::ReadTemperature).await?.cast_signed())
     }
 
     /// Read the number of starting trials.
