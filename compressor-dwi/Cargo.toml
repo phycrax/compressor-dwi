@@ -1,12 +1,13 @@
 [package]
 name = "compressor-dwi"
 version = "0.1.0"
-edition = "2024"
-description = "Dual-wire async serial protocol driver for compressor drivers"
-repository = "https://github.com/phycrax/compressor-dwi"
-license = "MIT OR Apache-2.0"
-categories = ["embedded", "no-std", "asynchronous"]
-keywords = ["compressor", "driver", "hvac"]
+description = "Frame and transport layer for the Dual Wire Interface (DWI) of variable-speed compressor drives"
+keywords = ["compressor", "driver", "hvac", "dwi"]
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+categories.workspace = true
 
 [features]
 defmt = ["dep:defmt"]

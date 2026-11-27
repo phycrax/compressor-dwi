@@ -7,6 +7,14 @@ members = [
     "embraco-dwi",
 ]
 
+[workspace.package]
+edition = "2024"
+rust-version = "1.88"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/phycrax/compressor-dwi"
+categories = ["embedded", "no-std", "asynchronous", "hardware-support"]
+
 [workspace.dependencies]
+compressor-dwi      = { version = "0.1.0", path = "compressor-dwi" }
 defmt               = { version = "1.2" }
 embedded-io-async   = { version = "0.7" }
