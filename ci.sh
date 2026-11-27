@@ -42,7 +42,11 @@ cargo_test() {
 cargo_test
 
 cargo_check --target=thumbv6m-none-eabi
-cargo_check --target=thumbv6m-none-eabi --no-default-features
+cargo_check --target=thumbv6m-none-eabi --all-features
+
+# Minimum supported Rust version, keep in sync with `rust-version` in Cargo.toml.
+has_toolchain 1.88 || rustup toolchain install 1.88 --profile=minimal
+cargo +1.88 check --all --all-features
 
 cargo +nightly fmt --all -- --check
 
