@@ -73,3 +73,62 @@ impl CommunicationError {
         }
     }
 }
+
+impl<TX, RX> core::fmt::Display for Error<TX, RX> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(match self {
+            Self::Read(_) => "serial read failed",
+            Self::Write(_) => "serial write failed",
+            Self::UnexpectedEof => "serial input ended before a full response",
+            Self::Response(_) => "bad response from the compressor",
+        })
+    }
+}
+
+impl<TX, RX> core::error::Error for Error<TX, RX>
+where
+    TX: core::error::Error + 'static,
+    RX: core::error::Error + 'static,
+{
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            Self::Read(e) => Some(e),
+            Self::Write(e) => Some(e),
+            Self::UnexpectedEof => None,
+            Self::Response(e) => Some(e),
+        }
+    }
+}
+
+impl core::fmt::Display for ResponseError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(match self {
+            Self::Integrity => "checksum mismatch",
+            Self::RxId => "frame does not start with 0x5A",
+            Self::InvalidResponse => "unexpected command byte",
+            Self::Communication(_) => "compressor rejected the request",
+        })
+    }
+}
+
+impl core::error::Error for ResponseError {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            Self::Communication(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
+impl core::fmt::Display for CommunicationError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(match self {
+            Self::DataHigh => "error in data high byte",
+            Self::Checksum => "checksum error",
+            Self::Command => "unknown command code",
+            Self::DataLow => "error in data low byte",
+        })
+    }
+}
+
+impl core::error::Error for CommunicationError {}
