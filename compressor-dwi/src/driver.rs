@@ -118,9 +118,6 @@ mod tests {
         let mut sent = [0u8; 5];
         let mut driver = Driver::new(&mut sent[..], &[] as &[u8]);
 
-        assert!(matches!(
-            block_on(driver.transact(&READ_SET_SPEED)),
-            Err(Error::UnexpectedEof)
-        ));
+        assert_eq!(block_on(driver.transact(&READ_SET_SPEED)), Err(Error::UnexpectedEof));
     }
 }

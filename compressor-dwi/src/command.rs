@@ -95,19 +95,19 @@ mod tests {
     #[test]
     fn validate_rejects_bad_rx_id() {
         let resp = [0xA5, 0x00, 0x00, 0x00, 0x5B];
-        assert!(matches!(PROBE.validate(&resp), Err(ResponseError::RxId)));
+        assert_eq!(PROBE.validate(&resp), Err(ResponseError::RxId));
     }
 
     #[test]
     fn validate_rejects_unexpected_command_code() {
         let resp = [0x5A, 0x01, 0x00, 0x00, 0xA5];
-        assert!(matches!(PROBE.validate(&resp), Err(ResponseError::InvalidResponse)));
+        assert_eq!(PROBE.validate(&resp), Err(ResponseError::InvalidResponse));
     }
 
     #[test]
     fn validate_rejects_bad_checksum() {
         let resp = [0x5A, 0x00, 0x00, 0x00, 0x00];
-        assert!(matches!(PROBE.validate(&resp), Err(ResponseError::Integrity)));
+        assert_eq!(PROBE.validate(&resp), Err(ResponseError::Integrity));
     }
 
     #[test]
@@ -119,10 +119,7 @@ mod tests {
             ([0x5A, 0xF8, 0xFF, 0xFF, 0xB0], CommunicationError::DataLow),
         ];
         for (resp, expected) in cases {
-            match PROBE.validate(&resp) {
-                Err(ResponseError::Communication(code)) => assert_eq!(code, expected),
-                other => panic!("expected communication error, got {other:?}"),
-            }
+            assert_eq!(PROBE.validate(&resp), Err(ResponseError::Communication(expected)));
         }
     }
 }
