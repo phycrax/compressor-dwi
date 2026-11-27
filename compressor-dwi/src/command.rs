@@ -82,10 +82,12 @@ mod tests {
 
     #[test]
     fn validate_accepts_valid_response_frames() {
-        let cases: [(Command, [u8; 5]); 3] = [
+        let cases: [(Command, [u8; 5]); 4] = [
             (PROBE, [0x5A, 0x00, 0x00, 0x00, 0xA6]),
             (Command::new(0x3E, 0x000E, 0x3E), [0x5A, 0x3E, 0x00, 0x00, 0x68]),
             (Command::new(0x3F, 0x0001, 0x3F), [0x5A, 0x3F, 0x00, 0x00, 0x67]),
+            // A temperature of -0.1 °C reads as 0xFFFF and is not a communication-error.
+            (Command::new(0x3C, 0x3988, 0x88), [0x5A, 0x88, 0xFF, 0xFF, 0x20]),
         ];
         for (cmd, resp) in cases {
             cmd.validate(&resp).unwrap();
