@@ -1,6 +1,9 @@
 #!/bin/sh
 set -ex
 
+# Fail on warnings from rustc, clippy, rustdoc, and Cargo's own lints such as unused dependencies.
+export CARGO_BUILD_WARNINGS=deny
+
 has_target() {
   rustup target list --installed | grep -q "$1"
 }
@@ -32,7 +35,7 @@ ensure_component nightly rustfmt
 
 cargo_check() {
   cargo check --all "$@"
-  cargo clippy --all "$@" -- --deny=warnings
+  cargo clippy --all "$@"
 }
 cargo_test() {
   cargo_check --all-targets "$@"
@@ -51,4 +54,4 @@ cargo +1.88 check --all --all-features
 cargo +nightly fmt --all -- --check
 
 # Check docs.rs build
-env RUSTDOCFLAGS='--cfg=docsrs --deny=warnings' cargo +nightly doc --all --no-deps --all-features
+env RUSTDOCFLAGS='--cfg=docsrs' cargo +nightly doc --all --no-deps --all-features
