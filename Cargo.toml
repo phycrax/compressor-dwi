@@ -12,6 +12,7 @@ edition = "2024"
 rust-version = "1.88"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/phycrax/compressor-dwi"
+readme = "README.md"
 categories = ["embedded", "no-std", "asynchronous", "hardware-support"]
 
 [workspace.dependencies]
