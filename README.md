@@ -1,12 +1,16 @@
 # compressor-dwi
 
+[![CI](https://github.com/phycrax/compressor-dwi/actions/workflows/ci.yml/badge.svg)](https://github.com/phycrax/compressor-dwi/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#license)
+![MSRV](https://img.shields.io/badge/rustc-1.88+-blue)
+
 Async `no_std` Rust drivers for the Dual Wire Interface (DWI) of variable-speed compressor drives.
 
-| Crate | Compressor | Tested on hardware |
-| --- | --- | --- |
-| [`secop-dwi`](https://crates.io/crates/secop-dwi) | Secop NLV/SLVE | Yes, on SLVE18CN |
-| [`embraco-dwi`](https://crates.io/crates/embraco-dwi) | Embraco CF10B | No |
-| [`compressor-dwi`](https://crates.io/crates/compressor-dwi) | Shared core used by both | - |
+| Crate | Version | Docs | Compressor | Tested on hardware |
+| --- | --- | --- | --- | --- |
+| `secop-dwi` | [![crates.io](https://img.shields.io/crates/v/secop-dwi)](https://crates.io/crates/secop-dwi) | [![docs.rs](https://img.shields.io/docsrs/secop-dwi)](https://docs.rs/secop-dwi) | Secop NLV/SLVE | Yes, on SLVE18CN |
+| `embraco-dwi` | [![crates.io](https://img.shields.io/crates/v/embraco-dwi)](https://crates.io/crates/embraco-dwi) | [![docs.rs](https://img.shields.io/docsrs/embraco-dwi)](https://docs.rs/embraco-dwi) | Embraco CF10B | No |
+| `compressor-dwi` | [![crates.io](https://img.shields.io/crates/v/compressor-dwi)](https://crates.io/crates/compressor-dwi) | [![docs.rs](https://img.shields.io/docsrs/compressor-dwi)](https://docs.rs/compressor-dwi) | Shared core used by both | - |
 
 ## Usage
 
