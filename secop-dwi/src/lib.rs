@@ -1,4 +1,24 @@
-//! Dual Wire Interface (DWI) driver for Secop CCD compressors (NLV/SLVE).
+//! Dual Wire Interface (DWI) driver for Secop CCD compressor drives (NLV/SLVE).
+//!
+//! Tested on a Secop SLVE18CN.
+//!
+//! ```no_run
+//! use embedded_io_async::{Read, ReadReady, Write};
+//! use secop_dwi::{Compressor, Error};
+//!
+//! async fn run<TX: Write, RX: Read + ReadReady>(tx: TX, rx: RX) -> Result<(), Error<TX::Error, RX::Error>> {
+//!     let mut compressor = Compressor::new(tx, rx);
+//!
+//!     // Run at 3000 RPM. Send 0 to stop.
+//!     let status = compressor.set_speed(3000).await?;
+//!     if let Some(faults) = status.faults {
+//!         // Handle the faults.
+//!     }
+//!
+//!     let rpm = compressor.read_actual_speed().await?;
+//!     Ok(())
+//! }
+//! ```
 #![no_std]
 #![warn(missing_docs)]
 
@@ -17,7 +37,7 @@ pub struct Status {
 }
 
 impl Status {
-    /// [`Request::SetSpeed`] and [`Request::ReadStatus`] answers with this.
+    /// Decode the status word that [`Request::SetSpeed`] and [`Request::ReadStatus`] answer with.
     pub const fn from_bits(raw: u16) -> Self {
         Self {
             running: raw & 0xFF00 == 0,
@@ -64,7 +84,7 @@ impl Faults {
     }
 }
 
-/// Request to the compressor with an u16 response.
+/// Request to the compressor with a u16 response.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Request {
@@ -78,7 +98,7 @@ pub enum Request {
     ReadActualSpeed,
     /// Read the power consumption (W).
     ReadPower,
-    /// Read the compressor temperature in 0.1 °C, as an `i16`.
+    /// Read the inverter temperature in 0.1 °C, as an `i16`.
     ReadTemperature,
     /// Read the input voltage (V).
     ReadInputVoltage,
@@ -147,7 +167,7 @@ impl<TX: Write, RX: Read + ReadReady> Compressor<TX, RX> {
         self.request(Request::ReadPower).await
     }
 
-    /// Read the compressor temperature in 0.1 °C.
+    /// Read the inverter temperature in 0.1 °C.
     pub async fn read_temperature(&mut self) -> Result<i16, Error<TX::Error, RX::Error>> {
         Ok(self.request(Request::ReadTemperature).await?.cast_signed())
     }

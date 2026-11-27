@@ -1,4 +1,6 @@
-//! Core of the dual-wire serial protocol shared by compressor drivers.
+//! Core of the Dual Wire Interface (DWI) protocol shared by compressor drivers.
+//!
+//! Most users want [`secop-dwi`](https://docs.rs/secop-dwi) or [`embraco-dwi`](https://docs.rs/embraco-dwi) instead.
 #![no_std]
 #![warn(missing_docs)]
 
