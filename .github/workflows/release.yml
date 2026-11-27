@@ -1,8 +1,9 @@
 name: Release
 
-# Releases one crate per tag. Bump the version in the crate's Cargo.toml, rename the
-# "Unreleased" section of its CHANGELOG.md to "<version> - <date>", commit, then push
-# a tag named `<crate>-v<version>`, e.g. `secop-dwi-v0.1.1`.
+# Releases one crate per tag named `<crate>-v<version>`, e.g. `secop-dwi-v0.1.1`.
+# Write the notes under "## Unreleased" in the crate's CHANGELOG.md, then run
+#   cargo release patch -p secop-dwi --execute
+# which bumps the version, dates the changelog entry, commits, tags and pushes (see release.toml).
 # Release `compressor-dwi` first when the other crates need its new version.
 on:
   push:
