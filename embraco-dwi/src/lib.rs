@@ -2,8 +2,8 @@
 #![no_std]
 #![warn(missing_docs)]
 
-pub use compressor_dwi::Error;
 use compressor_dwi::{Command, Driver};
+pub use compressor_dwi::{CommunicationError, Error, ResponseError};
 use embedded_io_async::{Read, ReadReady, Write};
 
 /// Operation status of the compressor.

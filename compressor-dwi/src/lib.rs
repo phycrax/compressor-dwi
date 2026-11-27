@@ -8,4 +8,4 @@ mod error;
 
 pub use command::Command;
 pub use driver::Driver;
-pub use error::*;
+pub use error::{CommunicationError, Error, ResponseError};
